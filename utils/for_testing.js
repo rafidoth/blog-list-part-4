@@ -14,11 +14,8 @@ const totalLikes = blogs =>{
 
 const favouriteBlog = blogs =>{
   let listLikes = blogs.map(blog=>blog.likes)
-  console.log(listLikes)
   let maxLike = Math.max(...listLikes)
-  console.log(maxLike)
   let favourite = blogs.filter((blog)=>blog.likes===maxLike);
-  console.log(favourite)
   return {
       title : favourite[0].title,
       author : favourite[0].author,
