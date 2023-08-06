@@ -23,8 +23,44 @@ test('the first blog title is g world', async () => {
 
 test('unique identifier property of the blog posts is named id', async()=>{
   const response = await api.get('/api/blogs')
-  console.log(response._body)
   expect(response.body[0].id).toBeDefined()
+})
+
+test('new blog can be added', async()=>{
+  const beforePost = await api.get('/api/blogs')
+  const newBlog = {
+      title: 'g world',
+      author: 'Rafgi',
+      url: 'ddgdd.com',
+      likes: 876
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-type',/application\/json/)
+  
+  const response = await api.get('/api/blogs')
+  const titles = response.body.map(b=>b.title)
+  expect(response.body).toHaveLength(beforePost.body.length+1)
+
+  
+})
+
+
+test('if the likes property is missing from the request, it will default to the value 0',async()=>{
+  const newBlog = {
+    title: 'newblog 1',
+    author: 'adsa',
+    url: 'ddasd.com',
+  }
+  const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+  
+  expect(response.body.likes).toBe(0)
+  
 })
 
 
