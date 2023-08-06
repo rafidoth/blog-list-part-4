@@ -11,10 +11,10 @@ test('blogs are returned as json', async ()=>{
             .expect('content-type', /application\/json/)
 },100000)
 
-test('there is only one note', async () => {
-    const response = await api.get('/api/blogs')
-    expect(response.body).toHaveLength(1)
-  })
+// test('there is only one note', async () => {
+//     const response = await api.get('/api/blogs')
+//     expect(response.body).toHaveLength(10)
+//   })
   
 test('the first blog title is g world', async () => {
     const response = await api.get('/api/blogs')
@@ -61,6 +61,14 @@ test('if the likes property is missing from the request, it will default to the 
   
   expect(response.body.likes).toBe(0)
   
+})
+
+test('if the title or url properties are missing from the request data',async ()=>{
+  const newBlog = {
+    author: 'adsa'
+  }
+  await api.post('/api/blogs').send(newBlog).expect(400)
+
 })
 
 

@@ -1,10 +1,12 @@
 const express = require('express')
 const app = express()
+require('express-async-errors')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const blogs = require('./controllers/blogs')
 const {mongoUrl, PORT} = require('./utils/config')
 const {logger} = require('./utils/logger')
+const errorHandler = require('./middlewares/errorHandling')
 // console.log(mongoUrl)
 mongoose.connect(mongoUrl)
     .then(()=>logger("database connected"))
@@ -13,6 +15,6 @@ mongoose.connect(mongoUrl)
 app.use(cors())
 app.use(express.json())
 app.use('/api/blogs',blogs)
-
+app.use(errorHandler)
 
 module.exports = app
