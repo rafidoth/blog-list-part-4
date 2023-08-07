@@ -71,6 +71,12 @@ test('if the title or url properties are missing from the request data',async ()
 
 })
 
+test('delete route works or not', async()=>{
+  const initial = await api.get('/api/blogs')
+  await api.delete(`/api/blogs/${initial.body[0].id}`)
+  const res = await api.get('/api/blogs')
+  expect(res.body.length).toBe(initial.body.length-1)
+})
 
 afterAll(async ()=>{
     await mongoose.connection.close

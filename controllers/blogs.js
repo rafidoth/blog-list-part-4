@@ -7,9 +7,20 @@ router.get('/', async (request, response) => {
     response.json(blogs)
   })
   
-  router.post('/', async (request, response) => {
-    const blog = new Blog(request.body)
-    const result = await blog.save()
-    response.status(201).json(result)
-  })
-  module.exports = router
+router.post('/', async (request, response) => {
+  const blog = new Blog(request.body)
+  const result = await blog.save()
+  response.status(201).json(result)
+})
+
+router.delete('/:id',async (req, res)=>{
+    await Blog.findByIdAndDelete(req.params.id);
+    res.send("Deleted Successfully")
+})
+
+router.put('/:id', async (req,res)=>{
+  await Blog.findByIdAndUpdate(req.params.id, req.body, {new:true})
+  res.json(req.body)
+})
+
+module.exports = router
