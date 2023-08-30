@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
+// const jwt = require('jsonwebtoken')
 
 // const getTokenFrom = request => {
 //   const authorization = request.get('authorization')
@@ -19,14 +19,10 @@ router.get('/', async (request, response) => {
   })
   
 router.post('/', async (request, response) => {
-  const body  = request.body
-  const token = request.token
-  const decodedToken = jwt.verify(token, process.env.SECRET)
-  const id = decodedToken.id
-  if (!id) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-  const user = await User.findById(id)
+  const body  = request.body;
+  const userId = request.user._id.toString();
+  const user = await User.findById(userId)
+
   const newBlog = {
     title : body.title,
     author : user.id,
@@ -41,15 +37,10 @@ router.post('/', async (request, response) => {
 })
 
 router.delete('/:id',async (req, res)=>{
-    const body  = req.body
-    const token = req.token
-    const decodedToken = jwt.verify(token, process.env.SECRET)
-    const id = decodedToken.id
-    if (!id) {
-      return res.status(401).json({ error: 'token invalid' })
-    }
+
+    const userId = req.user._id.toString();
     const blog = await Blog.findById(req.params.id);
-    if(blog.author.toString() === id.toString()){
+    if(blog.author.toString() === userId){
         await Blog.findByIdAndDelete(blog.id.toString())
     }
     res.send("Deleted Successfully")

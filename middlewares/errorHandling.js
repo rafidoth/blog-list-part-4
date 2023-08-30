@@ -8,7 +8,7 @@ const errorHandling = (err,req,res,next)=>{
           error: 'token expired'
         })
     }else{
-        res.status(500).send('Internal Error')
+        res.status(500).send('Internal Error dhur')
     }
 }
 

@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt')
 
 userRouter.post('/',async (req,res)=>{
     const {username, name, password} = req.body
-    console.log(password.length)
     if(password.length<4){
         return res.status(401).json({
             error: 'invalid password, it must be longer than 3 characters'

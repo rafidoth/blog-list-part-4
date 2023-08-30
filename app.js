@@ -7,6 +7,7 @@ const blogs = require('./controllers/blogs')
 const users = require('./controllers/users')
 const login = require('./controllers/login')
 const tokenExtractor = require('./middlewares/tokenExtractor')
+const userExtractor = require('./middlewares/userExtractor')
 const {mongoUrl, PORT} = require('./utils/config')
 const {logger} = require('./utils/logger')
 const errorHandler = require('./middlewares/errorHandling')
@@ -17,10 +18,13 @@ mongoose.connect(mongoUrl)
 
 app.use(cors())
 app.use(express.json())
-app.use(tokenExtractor)
-app.use('/api/blogs',blogs)
-app.use('/api/users',users)
 app.use('/api/login',login)
+app.use('/api/users',users)
+app.use(tokenExtractor)
+app.use(userExtractor)
+app.use('/api/blogs',blogs)
+
+
 app.use(errorHandler)
 
 module.exports = app
