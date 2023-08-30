@@ -21,9 +21,7 @@ router.get('/', async (request, response) => {
 router.post('/', async (request, response) => {
   const body  = request.body
   const token = request.token
-  console.log(token)
   const decodedToken = jwt.verify(token, process.env.SECRET)
-  console.log(decodedToken)
   const id = decodedToken.id
   if (!id) {
     return response.status(401).json({ error: 'token invalid' })
@@ -43,7 +41,17 @@ router.post('/', async (request, response) => {
 })
 
 router.delete('/:id',async (req, res)=>{
-    await Blog.findByIdAndDelete(req.params.id);
+    const body  = req.body
+    const token = req.token
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    const id = decodedToken.id
+    if (!id) {
+      return res.status(401).json({ error: 'token invalid' })
+    }
+    const blog = await Blog.findById(req.params.id);
+    if(blog.author.toString() === id.toString()){
+        await Blog.findByIdAndDelete(blog.id.toString())
+    }
     res.send("Deleted Successfully")
 })
 
