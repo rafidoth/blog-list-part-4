@@ -81,7 +81,7 @@ describe('blog test', ()=>{
       .expect('Content-type',/application\/json/)
     
     const blogsAtEnd = await api.get('/api/blogs')
-    console.log(blogsAtEnd.body)
+    // console.log(blogsAtEnd.body)
     expect(blogsAtEnd.body).toHaveLength(blogsAtStart.length+1)
   })
 

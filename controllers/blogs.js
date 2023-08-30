@@ -4,14 +4,14 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  // console.log(authorization)
-  if (authorization && authorization.startsWith('bearer ')) {
-    return authorization.replace('bearer ', '')
-  }
-  return null
-}
+// const getTokenFrom = request => {
+//   const authorization = request.get('authorization')
+//   // console.log(authorization)
+//   if (authorization && authorization.startsWith('bearer ')) {
+//     return authorization.replace('bearer ', '')
+//   }
+//   return null
+// }
 
 router.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate('author',{username :1,name:1})
@@ -20,17 +20,15 @@ router.get('/', async (request, response) => {
   
 router.post('/', async (request, response) => {
   const body  = request.body
-  // console.log(body)
-  const token = getTokenFrom(request)
-  // console.log('this',token)
+  const token = request.token
+  console.log(token)
   const decodedToken = jwt.verify(token, process.env.SECRET)
-  // console.log(decodedToken.sub)
-  const id = decodedToken.sub
+  console.log(decodedToken)
+  const id = decodedToken.id
   if (!id) {
     return response.status(401).json({ error: 'token invalid' })
   }
   const user = await User.findById(id)
-  // console.log(user)
   const newBlog = {
     title : body.title,
     author : user.id,
