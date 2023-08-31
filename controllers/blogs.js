@@ -15,7 +15,8 @@ const User = require('../models/user')
 
 router.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate('author',{username :1,name:1})
-    response.json(blogs)
+    console.log(blogs)
+    response.status(200).json(blogs)
   })
   
 router.post('/', async (request, response) => {

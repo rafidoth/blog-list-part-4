@@ -14,8 +14,11 @@ const api = supertest(app)
 describe('blog test', ()=>{
   let testToken;
   beforeEach(async ()=>{
+    //deleting all existing data in db
     await Blog.deleteMany({})
     await User.deleteMany({})
+
+    // Creating a new user for testing
     const passwordHash = await bcrypt.hash('abcdef',10)
     const user = new User({
       username : 'root',
@@ -23,13 +26,22 @@ describe('blog test', ()=>{
       passwordHash
     })
     await user.save()
+
+    //getting all users list
     const response = await api.get('/api/users')
     const users = response.body
-
+    console.log(users)
+    //Login to the application using the user just created above
     const testUserId = users[0].id;
     const testUsername = 'root';
-    testToken = createTestToken(testUserId, testUsername);
-
+    // testToken = createTestToken(testUserId, testUsername);
+    // console.log(testToken)
+    const loginBody = {
+      username : testUsername,
+      password : 'abcdef'
+    }
+    const loginRes = await api.post('/api/login').send(loginBody)
+    testToken = loginRes.body.token;
     const newBlog = new Blog({
         title : "first blog",
         author : users[0].id,
@@ -40,28 +52,29 @@ describe('blog test', ()=>{
   })
   test('blogs are returned as json', async ()=>{
       await api
-              .get('/api/blogs')
-              .expect(200)
-              .expect('content-type', /application\/json/)
+          .get('/api/blogs')
+          .set('Authorization', `bearer ${testToken}`)
+          .expect(200)
+          .expect('content-type', /application\/json/)
   },100000)
 
-  test('there is only one note', async () => {
-      const response = await api.get('/api/blogs')
+  test('there is only one blog', async () => {
+      const response = await api.get('/api/blogs').set('Authorization', `bearer ${testToken}`)
       expect(response.body).toHaveLength(1)
     })
     
   test('the first blog title is first blog', async () => {
-      const response = await api.get('/api/blogs')
+      const response = await api.get('/api/blogs').set('Authorization', `bearer ${testToken}`)
       expect(response.body[0].title).toBe('first blog')
     })
 
   test('unique identifier property of the blog posts is named id', async()=>{
-    const response = await api.get('/api/blogs')
+    const response = await api.get('/api/blogs').set('Authorization', `bearer ${testToken}`)
     expect(response.body[0].id).toBeDefined()
   })
 
   test('new blog can be added', async()=>{
-    const response = await api.get('/api/blogs')
+    const response = await api.get('/api/blogs').set('Authorization', `bearer ${testToken}`)
     const blogsAtStart = response.body;
     // console.log(blogsAtStart)
     const usersResponse = await api.get('/api/users')
@@ -74,13 +87,13 @@ describe('blog test', ()=>{
     }
     
     await api
-      .post('/api/blogs')
+      .post('/api/blogs').set('Authorization', `bearer ${testToken}`)
       .set('authorization', `bearer ${testToken}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-type',/application\/json/)
     
-    const blogsAtEnd = await api.get('/api/blogs')
+    const blogsAtEnd = await api.get('/api/blogs').set('Authorization', `bearer ${testToken}`)
     // console.log(blogsAtEnd.body)
     expect(blogsAtEnd.body).toHaveLength(blogsAtStart.length+1)
   })
@@ -94,7 +107,7 @@ describe('blog test', ()=>{
     }
     const response = await api
         .post('/api/blogs')
-        .set('authorization', `bearer ${testToken}`)
+        .set('Authorization', `bearer ${testToken}`)
         .send(newBlog)
     
     expect(response.body.likes).toBe(0)
@@ -104,9 +117,9 @@ describe('blog test', ()=>{
 
 
   test('delete route works or not', async()=>{
-    const initial = await api.get('/api/blogs')
-    await api.delete(`/api/blogs/${initial.body[0].id}`)
-    const res = await api.get('/api/blogs')
+    const initial = await api.get('/api/blogs').set('Authorization', `bearer ${testToken}`)
+    await api.delete(`/api/blogs/${initial.body[0].id}`).set('Authorization', `bearer ${testToken}`)
+    const res = await api.get('/api/blogs').set('Authorization', `bearer ${testToken}`)
     expect(res.body.length).toBe(initial.body.length-1)
   })
 
