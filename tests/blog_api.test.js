@@ -31,17 +31,18 @@ describe('blog test', ()=>{
     const response = await api.get('/api/users')
     const users = response.body
     console.log(users)
+
+
     //Login to the application using the user just created above
-    const testUserId = users[0].id;
     const testUsername = 'root';
-    // testToken = createTestToken(testUserId, testUsername);
-    // console.log(testToken)
     const loginBody = {
       username : testUsername,
       password : 'abcdef'
     }
     const loginRes = await api.post('/api/login').send(loginBody)
     testToken = loginRes.body.token;
+
+    //creating a new blog
     const newBlog = new Blog({
         title : "first blog",
         author : users[0].id,
